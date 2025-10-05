@@ -1,0 +1,109 @@
+{
+  "name": "omnipack-toolkit",
+  "displayName": "OmniPack Toolkit",
+  "description": "Manage Vlocity DataPacks with ease — retrieve and export",
+  "version": "1.0.0",
+  "publisher": "im83.75",
+  "engines": {
+    "vscode": "^1.104.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "omnipack-toolkit.refreshDatapacks",
+        "title": "Vlocity: Refresh Datapacks",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "omnipack-toolkit.exportDataPack",
+        "title": "Vlocity: Export Datapack"
+      },
+      {
+        "command": "omnipack-toolkit.configure",
+        "title": "Vlocity: Configure Settings",
+        "icon": "$(settings-gear)"
+      },
+      {
+        "command": "omnipack-toolkit.helloWorld",
+        "title": "Extension Health Check"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "vlocity-datapack-explorer",
+          "title": "OmniPack Toolkit",
+          "icon": "$(cloud-download)"
+        }
+      ]
+    },
+    "views": {
+      "vlocity-datapack-explorer": [
+        {
+          "id": "vlocityDataPackExplorer",
+          "name": "Datapack Explorer",
+          "icon": "$(package)"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "omnipack-toolkit.refreshDatapacks",
+          "when": "view == vlocityDataPackExplorer",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "omnipack-toolkit.exportDataPack",
+          "when": "view == vlocityDataPackExplorer && viewItem == datapackItem"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Vlocity Datapack Manager",
+      "properties": {
+        "vlocityDatapackManager.cliPath": {
+          "type": "string",
+          "default": "vlocity",
+          "description": "Path to vlocity CLI command"
+        },
+        "vlocityDatapackManager.projectPath": {
+          "type": "string",
+          "default": "./vlocity",
+          "description": "Path to your Vlocity project directory"
+        },
+        "vlocityDatapackManager.sfdxUsername": {
+          "type": "string",
+          "default": "",
+          "description": "SFDX username/alias for the target org"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.18.7",
+    "@types/vscode": "^1.104.0",
+    "@typescript-eslint/eslint-plugin": "^8.42.0",
+    "@typescript-eslint/parser": "^8.42.0",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^9.34.0",
+    "typescript": "^5.9.2"
+  }
+}
