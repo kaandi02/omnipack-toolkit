@@ -133,7 +133,7 @@ I kept the configs minimal – no fluff.
 
 ## Why I Built This
 
-As a dev who's wrestled with Vlocity for years, I wanted something that just *works*. No overcomplicated features, just the core stuff to speed up your day. It's open-source, so if you spot a bug or have an idea (like adding more datapack types), fork it and PR away!
+As a dev who's wrestled with Vlocity, I wanted something that just *works*. No overcomplicated features, just the core stuff to speed up your day. It's open-source, so if you spot a bug or have an idea (like adding more datapack types), fork it and PR away!
 
 ## Support This Project
 
