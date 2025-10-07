@@ -106,11 +106,6 @@ If something goes wrong (hey, Salesforce can be picky), check the output channel
 
 Tweak these in VS Code's Settings (JSON or UI):
 
-
-- `vlocityDatapackManager.cliPath`: Path to the Vlocity CLI (defaults to "vlocity").
-
-- `vlocityDatapackManager.projectPath`: Your Vlocity project directory (defaults to "./vlocity").
-
 - `vlocityDatapackManager.sfdxUsername`: Your SFDX org username or alias.
 
 

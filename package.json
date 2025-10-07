@@ -70,16 +70,6 @@
     "configuration": {
       "title": "Vlocity Datapack Manager",
       "properties": {
-        "vlocityDatapackManager.cliPath": {
-          "type": "string",
-          "default": "vlocity",
-          "description": "Path to vlocity CLI command"
-        },
-        "vlocityDatapackManager.projectPath": {
-          "type": "string",
-          "default": "./vlocity",
-          "description": "Path to your Vlocity project directory"
-        },
         "vlocityDatapackManager.sfdxUsername": {
           "type": "string",
           "default": "",

@@ -18,7 +18,7 @@ export async function executeCliCommand(command: string, options?: { cwd?: strin
 
 export async function checkVlocityInstalled(): Promise<boolean> {
     const config = vscode.workspace.getConfiguration('vlocityDatapackManager');
-    let cliPath = config.get<string>('cliPath') || 'vlocity';
+    let cliPath = 'vlocity';
     try {
         if (!await checkNodeVersion()) {
             vscode.window.showErrorMessage('Node.js 18+ required for Vlocity CLI. Download from https://nodejs.org/');
