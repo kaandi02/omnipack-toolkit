@@ -7,11 +7,25 @@ import { executeCliCommand } from '../utils/cli';
 
 export async function exportDatapack(item: DatapackItem) {
     const config = vscode.workspace.getConfiguration('vlocityDatapackManager');
-    const cliPath = config.get<string>('cliPath') || 'vlocity';
-    const projectPath = config.get<string>('projectPath');
+    const cliPath = 'vlocity';
     const sfdxUsername = config.get<string>('sfdxUsername');
+    const workspaceFolders = vscode.workspace.workspaceFolders;
 
-    if (!projectPath || !sfdxUsername) {
+    if (!workspaceFolders) {
+        vscode.window.showErrorMessage('No workspace folder is open.');
+        return;
+    }
+    const workspacePath = workspaceFolders[0].uri.fsPath;
+
+    let projectPath = await vscode.window.showOpenDialog({
+        canSelectFiles: false,
+        canSelectFolders: true,
+        canSelectMany: false,
+        openLabel: 'Select Vlocity Project Folder',
+        defaultUri: vscode.Uri.file(`${workspaceFolders[0].uri}/vlocity`)
+    });
+
+    if (!projectPath || !sfdxUsername || !projectPath[0] === null) {
         vscode.window.showErrorMessage('Please configure project path and SFDX username first!');
         return;
     }
@@ -41,12 +55,6 @@ export async function exportDatapack(item: DatapackItem) {
         const exportKey = mapping.exportKeyFormat.replace('{label}', item.datapackId);
         const command = `${cliPath} --sfdx.username ${sfdxUsername} --projectPath ${projectPath} packExport --key ${exportKey} --nojob --maxDepth ${depth} --json`;
 
-        const workspaceFolders = vscode.workspace.workspaceFolders;
-        if (!workspaceFolders) {
-            vscode.window.showErrorMessage('No workspace folder is open.');
-            return;
-        }
-        const workspacePath = workspaceFolders[0].uri.fsPath;
 
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,

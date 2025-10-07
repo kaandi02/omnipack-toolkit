@@ -6,6 +6,11 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
-## [1.0.0] - 2025-10-06
+## [0.0.2] - 2025-10-07
+
+- Added projectPath to be updated from the user everytime trying to export a datapack.
+- Removed cliPath and projectPath from extension configuration.
+
+## [0.0.1] - 2025-10-06
 
 - Initial Release

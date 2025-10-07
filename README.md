@@ -6,20 +6,22 @@
 Hey there! If you're knee-deep in Salesforce development with Vlocity (OmniStudio), you know how fiddly managing datapacks can be. Exporting, deploying, and keeping everything organized? It's a hassle without the right tools. That's why I built **OmniPack Toolkit** – a straightforward VS Code extension that streamlines exporting right from your editor. No more jumping between terminals and UIs; just smooth, integrated workflows.
 
 
+It is not a complete package, but there should be a starting point always and this is it(^_~).
 
-I created this because I got tired of the manual grind during my own projects. It's designed to feel intuitive, with a tree view for browsing datapacks, quick exports (with or without dependencies), and easy deploys. Let's dive in!
+
+I created this because I got tired of the manual grind during my own projects. It's designed to feel intuitive, to browse datapacks and quick exports (with or without dependencies). Let's dive in!
 
 
 
 ## What Makes It Awesome?
 
-- **Native CLI**: Uses native vlocity-cli to export and fetch the datapacks.
+- **Native CLI**: Uses native **[Vlocity-CLI](https://github.com/vlocityinc/vlocity_build)** to export and fetch the datapacks.
 
 - **Datapack Explorer Tree View**: Browse categories like OmniScripts, DataRaptors, Products, and more in a clean sidebar tree. Expand to see available datapacks from your org, and export them with a right-click.
 
 - **Export with Flexibility**: Choose to export a single datapack or grab all its dependencies. It uses the Vlocity CLI under the hood for reliable results.
 
-- **Smart Configuration**: Set up your project path, SFDX username (or alias), and CLI path once, and you're good. It even pulls org aliases from your SFDX setup for easy selection.
+- **Smart Configuration**: Set up your SFDX username (or alias), and you're good. It even pulls org aliases from your SFDX setup for easy selection.
 
 - **Status Bar Integration**: See your selected SFDX org at a glance in the status bar – click to reconfigure on the fly.
 
@@ -93,6 +95,8 @@ Once installed, you'll see the **Vlocity DataPack Explorer** in your sidebar. If
 
 - Right-click a datapack item and select "Export DataPack".
 
+- Choose the path where you want to export the datapack.
+
 - Choose "No Dependencies" for a quick export or "All Dependencies" for the full chain.
 
 - Watch the progress in notifications – success messages and logs appear in an output channel.
@@ -106,17 +110,10 @@ If something goes wrong (hey, Salesforce can be picky), check the output channel
 
 Tweak these in VS Code's Settings (JSON or UI):
 
-
-- `vlocityDatapackManager.cliPath`: Path to the Vlocity CLI (defaults to "vlocity").
-
-- `vlocityDatapackManager.projectPath`: Your Vlocity project directory (defaults to "./vlocity").
-
 - `vlocityDatapackManager.sfdxUsername`: Your SFDX org username or alias.
 
 
-
 I kept the configs minimal – no fluff.
-
 
 
 ## Troubleshooting
@@ -133,7 +130,7 @@ I kept the configs minimal – no fluff.
 
 ## Why I Built This
 
-As a dev who's wrestled with Vlocity, I wanted something that just *works*. No overcomplicated features, just the core stuff to speed up your day. It's open-source, so if you spot a bug or have an idea (like adding more datapack types), fork it and PR away!
+As a dev who's wrestled with Vlocity, I wanted something that just *works* without using any manifest file to extract a datapack everytime. No overcomplicated features, just the core stuff to speed up your day. It's open-source, so if you spot a bug or have an idea (like adding more datapack types), fork it and PR away!
 
 ## Support This Project
 
