@@ -8,6 +8,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [0.0.2] - 2025-10-07
 
+- Fixed export path mismatch
+
+## [0.0.2] - 2025-10-07
+
 - Added projectPath to be updated from the user everytime trying to export a datapack.
 - Removed cliPath and projectPath from extension configuration.
 

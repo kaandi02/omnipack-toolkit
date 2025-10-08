@@ -2,7 +2,7 @@
   "name": "omnipack-toolkit",
   "displayName": "OmniPack Toolkit",
   "description": "Manage Vlocity DataPacks with ease — retrieve and export",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "publisher": "im5C",
   "icon": "icon.png",
   "engines": {
