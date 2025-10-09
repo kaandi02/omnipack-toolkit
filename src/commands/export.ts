@@ -22,10 +22,10 @@ export async function exportDatapack(item: DatapackItem) {
         canSelectFolders: true,
         canSelectMany: false,
         openLabel: 'Select Vlocity Project Folder',
-        defaultUri: vscode.Uri.file(`${workspaceFolders[0].uri}/vlocity`)
+        defaultUri: vscode.Uri.file(`${workspacePath}/vlocity`)
     });
 
-    if (!projectPath || !sfdxUsername || !projectPath[0] === null) {
+    if (!projectPath || !sfdxUsername) {
         vscode.window.showErrorMessage('Please configure project path and SFDX username first!');
         return;
     }

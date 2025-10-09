@@ -41,8 +41,8 @@ function updateStatusBar() {
     const selectedAlias = config.get<string>('sfdxUsername');
     if (selectedAlias) {
         statusBarItem.text = `$(link) ${selectedAlias}`;
-        statusBarItem.show();
     } else {
-        statusBarItem.hide();
+        statusBarItem.text = `$(link) Select an Org`;
     }
+    statusBarItem.show();
 }

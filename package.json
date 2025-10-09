@@ -2,8 +2,10 @@
   "name": "omnipack-toolkit",
   "displayName": "OmniPack Toolkit",
   "description": "Manage Vlocity DataPacks with ease — retrieve and export",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "publisher": "im5C",
+  "repository": "https://github.com/kaandi02/omnipack-toolkit",
+  "license": "MIT",
   "icon": "icon.png",
   "engines": {
     "vscode": "^1.104.0"
