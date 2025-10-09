@@ -53,7 +53,7 @@ export async function exportDatapack(item: DatapackItem) {
 
     try {
         const exportKey = mapping.exportKeyFormat.replace('{label}', item.datapackId);
-        const command = `${cliPath} --sfdx.username ${sfdxUsername} --projectPath ${projectPath} packExport --key ${exportKey} --nojob --maxDepth ${depth} --json`;
+        const command = `${cliPath} --sfdx.username ${sfdxUsername} --projectPath ${projectPath[0].fsPath} packExport --key ${exportKey} --nojob --maxDepth ${depth} --json`;
 
 
         await vscode.window.withProgress({

@@ -6,6 +6,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.0.3] - 2025-10-08
+
+- Fixed export path mismatch
+
 ## [0.0.2] - 2025-10-07
 
 - Added projectPath to be updated from the user everytime trying to export a datapack.
