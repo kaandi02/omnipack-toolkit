@@ -1,13 +1,19 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as vscode from 'vscode';
-import * as path from 'path';
-import * as os from 'os';
-import * as fs from 'fs/promises';
 
 const execAsync = promisify(exec);
 
-export async function executeCliCommand(command: string, options?: { cwd?: string; maxBuffer?: number }): Promise<{ stdout: string; stderr: string }> {
+export interface OrgInfo {
+    alias: string;
+    username: string;
+    orgId: string;
+    instanceUrl: string;
+    connectedStatus: string;
+    isDefault?: boolean;
+}
+
+export async function executeCliCommand( command: string, options?: { cwd?: string; maxBuffer?: number }): Promise<{ stdout: string; stderr: string }> {
     try {
         const { stdout, stderr } = await execAsync(command, options);
         return { stdout: stdout.toString(), stderr: stderr.toString() };
@@ -16,16 +22,63 @@ export async function executeCliCommand(command: string, options?: { cwd?: strin
     }
 }
 
+
+export async function detectCli(): Promise<'sf' | null> {
+    try {
+        await execAsync('sf --version');
+        return 'sf';
+    } catch {
+        return null;
+    }
+}
+
+
+export async function listOrgs(): Promise<OrgInfo[]> {
+    const cli = await detectCli();
+    if (!cli) { return []; }
+
+    try {
+        return await listOrgsViaSf();
+    } catch {
+        return [];
+    }
+}
+
+async function listOrgsViaSf(): Promise<OrgInfo[]> {
+
+    let stdout = '';
+    try {
+        const result = await execAsync('sf org list --json', { timeout: 15000 });
+        stdout = result.stdout;
+    } catch (err: any) {
+        stdout = err.stdout || '';
+    }
+
+    if (!stdout.trim()) { return []; }
+
+    const json = JSON.parse(stdout);
+    const nonScratch: any[] = json?.result?.nonScratchOrgs ?? [];
+    const scratch: any[] = json?.result?.scratchOrgs ?? [];
+    const allOrgs = [...nonScratch, ...scratch];
+
+    return allOrgs.map((org: any): OrgInfo => ({
+        alias: org.alias || '',
+        username: org.username || '',
+        orgId: org.orgId || '',
+        instanceUrl: org.instanceUrl || '',
+        connectedStatus: org.connectedStatus || 'Unknown',
+        isDefault: !!org.isDefaultusername || !!org.isDefaultDevHubusername,
+    })).filter(org => !!org.username);
+}
+
 export async function checkVlocityInstalled(): Promise<boolean> {
-    const config = vscode.workspace.getConfiguration('vlocityDatapackManager');
-    let cliPath = 'vlocity';
     try {
         if (!await checkNodeVersion()) {
-            vscode.window.showErrorMessage('Node.js 18+ required for Vlocity CLI. Download from https://nodejs.org/');
+            vscode.window.showErrorMessage('Node.js is required for Vlocity CLI. Download from https://nodejs.org/');
             return true;
         }
-        const { stdout } = await executeCliCommand(`${cliPath} --version`);
-        console.log(`Vlocity CLI version: ${stdout.trim()}`);
+        const { stdout } = await executeCliCommand('vlocity --version');
+        console.log(`Installed Vlocity CLI: ${stdout.trim()}`);
         return true;
     } catch {
         return false;
@@ -35,21 +88,12 @@ export async function checkVlocityInstalled(): Promise<boolean> {
 async function checkNodeVersion(): Promise<boolean> {
     try {
         const { stdout } = await execAsync('node -v');
-        const version = stdout.trim().slice(1);
-        const major = parseInt(version.split('.')[0], 10);
-        return major >= 18;
-    } catch (error) {
-        return false;
-    }
-}
-
-export async function getAliases(): Promise<string[]> {
-    try {
-        const aliasPath = path.join(os.homedir(), '.sfdx', 'alias.json');
-        const aliasContent = await fs.readFile(aliasPath, 'utf-8');
-        const aliasJson = JSON.parse(aliasContent);
-        return Object.keys(aliasJson.orgs || {});
+        const major = parseInt(stdout.trim().slice(1).split('.')[0], 10);
+        if(major <= 22){
+            vscode.window.showWarningMessage('Node.js version 22 or lower are out of security support. Please upgrade to Node.js 24 or later from https://nodejs.org/');
+        }
+        return major >= 22;
     } catch {
-        return [];
+        return false;
     }
 }

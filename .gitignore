@@ -24,3 +24,10 @@ yarn-error.log*
 # Editor directories
 .vscode/
 .idea/
+
+# Vlocity temporary directory
+vlocity-temp/
+VlocityBuildLog.yaml
+
+# Next set of deliveries
+improvements/

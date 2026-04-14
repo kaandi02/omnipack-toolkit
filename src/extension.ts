@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { DatapackWebviewProvider } from './providers/datapackWebviewProvider';
 import { DatapackTreeProvider } from './providers/datapackProvider';
 import { configureExtension, initStatusBar } from './commands/configure';
 import { exportDatapack } from './commands/export';
@@ -31,12 +32,14 @@ export async function activate(context: vscode.ExtensionContext) {
 	}
 
 	const datapackProvider = new DatapackTreeProvider();
-	vscode.window.registerTreeDataProvider('vlocityDataPackExplorer', datapackProvider);
-
 	context.subscriptions.push(
+		vscode.window.registerTreeDataProvider('vlocityDataPackExplorer', datapackProvider),
 		vscode.commands.registerCommand('omnipack-toolkit.configure', configureExtension),
-		vscode.commands.registerCommand('omnipack-toolkit.refreshDatapacks', () => refreshDatapacks(datapackProvider)),
+		vscode.commands.registerCommand('omnipack-toolkit.refreshDatapacks', refreshDatapacks),
 		vscode.commands.registerCommand('omnipack-toolkit.exportDataPack', exportDatapack),
+		vscode.commands.registerCommand('omnipack-toolkit.openUI', () => {
+			DatapackWebviewProvider.createOrShow(context.extensionUri);
+		}),
 	);
 
 	initStatusBar(context);

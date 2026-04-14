@@ -19,21 +19,22 @@
     "commands": [
       {
         "command": "omnipack-toolkit.refreshDatapacks",
-        "title": "Vlocity: Refresh Datapacks",
+        "title": "Refresh Datapacks",
         "icon": "$(refresh)"
       },
       {
         "command": "omnipack-toolkit.exportDataPack",
-        "title": "Vlocity: Export Datapack"
+        "title": "Export Datapack"
       },
       {
         "command": "omnipack-toolkit.configure",
-        "title": "Vlocity: Configure Settings",
+        "title": "Configure Settings",
         "icon": "$(settings-gear)"
       },
       {
-        "command": "omnipack-toolkit.helloWorld",
-        "title": "Extension Health Check"
+        "command": "omnipack-toolkit.openUI",
+        "title": "Open OmniPack Toolkit UI",
+        "icon": "$(browser)"
       }
     ],
     "viewsContainers": {
@@ -57,9 +58,8 @@
     "menus": {
       "view/title": [
         {
-          "command": "omnipack-toolkit.refreshDatapacks",
-          "when": "view == vlocityDataPackExplorer",
-          "group": "navigation"
+          "command": "omnipack-toolkit.openUI",
+          "when": "view == vlocityDataPackExplorer"
         }
       ],
       "view/item/context": [

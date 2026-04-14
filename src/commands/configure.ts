@@ -1,23 +1,67 @@
 import * as vscode from 'vscode';
-import { getAliases } from '../utils/cli';
+import { listOrgs, detectCli, OrgInfo } from '../utils/cli';
 
 let statusBarItem: vscode.StatusBarItem;
 
 export async function configureExtension() {
     const config = vscode.workspace.getConfiguration('vlocityDatapackManager');
 
-    let aliases = await getAliases();
-    let sfdxUsername: string | undefined;
-    if (aliases.length > 0) {
-        sfdxUsername = await vscode.window.showQuickPick(aliases, { placeHolder: 'Select SFDX Org Alias' });
-    } else {
-        return;
-    }
+    await vscode.window.withProgress(
+        { location: vscode.ProgressLocation.Notification, title: 'Loading Salesforce orgs…', cancellable: true },
+        async () => {
+            
+            let orgs: OrgInfo[] = [];
+            try {
+                orgs = await listOrgs();
+                console.log(`Found ${orgs.length} authenticated org(s).`);
+            } catch {
+                vscode.window.showErrorMessage('Failed to load orgs. Make sure Salesforce CLI is installed and authenticated.');
+                return;
+            }
 
-    if (sfdxUsername) { await config.update('sfdxUsername', sfdxUsername, vscode.ConfigurationTarget.Global); }
+            type OrgPickItem = vscode.QuickPickItem & { orgUsername?: string };
 
-    vscode.window.showInformationMessage('Vlocity configuration saved!');
-    updateStatusBar();
+            const orgItems: OrgPickItem[] = orgs.map(org => {
+                const connected  = org.connectedStatus?.toLowerCase().includes('connect');
+                const label      = org.alias ? `${org.alias}` : `${org.username}`;
+                const detail     = org.alias ? `${org.username}  •  ${org.instanceUrl}` : org.instanceUrl;
+
+                return {
+                    label,
+                    description: connected ? 'Connected' : org.connectedStatus,
+                    detail,
+                    orgUsername: org.username,
+                    alwaysShow: true,
+                };
+            });
+
+            const currentUsername = config.get<string>('sfdxUsername');
+            for (const item of orgItems) {
+                if (item.orgUsername === currentUsername) {
+                    item.description = (item.description ? item.description + '  ' : '') + '$(check) active';
+                }
+            }
+
+            const allItems: OrgPickItem[] = [...orgItems];
+
+            const picked = await vscode.window.showQuickPick(allItems, {
+                placeHolder: orgs.length
+                    ? 'Select an org to continue'
+                    : 'No authenticated orgs found. Please authenticate with Salesforce CLI.',
+                matchOnDescription: true,
+                matchOnDetail: true,
+                ignoreFocusOut: true,
+            });
+
+            if (!picked) { return; }
+
+            if (picked.orgUsername) {
+                await config.update('sfdxUsername', picked.orgUsername, vscode.ConfigurationTarget.Global);
+                vscode.window.showInformationMessage(`Selected org: ${picked.orgUsername}`);
+                updateStatusBar();
+            }
+        }
+    );
 }
 
 export function initStatusBar(context: vscode.ExtensionContext) {
@@ -37,12 +81,9 @@ export function initStatusBar(context: vscode.ExtensionContext) {
 }
 
 function updateStatusBar() {
+    if (!statusBarItem) { return; }
     const config = vscode.workspace.getConfiguration('vlocityDatapackManager');
     const selectedAlias = config.get<string>('sfdxUsername');
-    if (selectedAlias) {
-        statusBarItem.text = `$(link) ${selectedAlias}`;
-    } else {
-        statusBarItem.text = `$(link) Select an Org`;
-    }
+    statusBarItem.text = selectedAlias ? `$(link) ${selectedAlias}` : `$(link) Select an Org`;
     statusBarItem.show();
 }
