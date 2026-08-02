@@ -9,9 +9,12 @@ export class DatapackTreeProvider implements vscode.TreeDataProvider<DatapackIte
     readonly onDidChangeTreeData: vscode.Event<DatapackItem | undefined | null | void> = this._onDidChangeTreeData.event;
 
     private datapackCache: Map<string, DatapackRecord[]> = new Map();
+    private pageMap: Map<string, number> = new Map();
+    private readonly PAGE_SIZE = 50;
 
     async refresh(): Promise<void> {
         this.datapackCache.clear();
+        this.pageMap.clear();
         this._onDidChangeTreeData.fire();
     }
 
@@ -36,22 +39,40 @@ export class DatapackTreeProvider implements vscode.TreeDataProvider<DatapackIte
                 }
             }
 
+            let records: DatapackRecord[] = [];
+
             if (this.datapackCache.has(element.type)) {
-                const cached = this.datapackCache.get(element.type)!;
-                return cached.map(record => new DatapackItem(record.name, record.type, record.id, vscode.TreeItemCollapsibleState.None));
+                records = this.datapackCache.get(element.type)!;
+            } else {
+                try {
+                    records = await this.queryDataPacksFromOrg(element.type, sfdxUsername);
+                    this.datapackCache.set(element.type, records);
+                } catch (error: any) {
+                    return [new DatapackItem(`Error: ${error.message}`, element.type, undefined, vscode.TreeItemCollapsibleState.None)];
+                }
             }
 
-            try {
-                const records = await this.queryDataPacksFromOrg(element.type, sfdxUsername);
-                this.datapackCache.set(element.type ? element.type : '', records);
-                if (records.length > 0) {
-                    return records.map(record => new DatapackItem(record.name, record.type, record.id, vscode.TreeItemCollapsibleState.None));
-                }
+            if (records.length === 0) {
                 return [new DatapackItem("No Datapacks available for export", element.type, undefined, vscode.TreeItemCollapsibleState.None)];
-            } catch (error: any) {
-                return [new DatapackItem(`Error: ${error.message}`, element.type, undefined, vscode.TreeItemCollapsibleState.None)];
             }
+
+            const page = this.pageMap.get(element.type) || 1;
+            const slicedRecords = records.slice(0, page * this.PAGE_SIZE);
+
+            const items = slicedRecords.map(record => new DatapackItem(record.name, record.type, record.id, vscode.TreeItemCollapsibleState.None));
+
+            if (records.length > page * this.PAGE_SIZE) {
+                items.push(new DatapackItem('Load More...', element.type, undefined, vscode.TreeItemCollapsibleState.None, true));
+            }
+
+            return items;
         }
+    }
+
+    public loadMore(item: DatapackItem) {
+        const current = this.pageMap.get(item.type) || 1;
+        this.pageMap.set(item.type, current + 1);
+        this._onDidChangeTreeData.fire();
     }
 
     private async queryDataPacksFromOrg(type: string, sfdxUsername: string): Promise<DatapackRecord[]> {
@@ -61,6 +82,7 @@ export class DatapackTreeProvider implements vscode.TreeDataProvider<DatapackIte
         }
 
         const command = `vlocity packGetAllAvailableExports --nojob --sfdx.username ${sfdxUsername} --type ${type} --json`;
+        console.log(command);
         const { stdout } = await executeCliCommand(command, { maxBuffer: 1024 * 1024 * 10 });
         const result = JSON.parse(stdout);
 

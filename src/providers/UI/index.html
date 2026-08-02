@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OmniPack Toolkit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0" />
+<link rel="stylesheet" href="__STYLE_URI__">
+</head>
+<body>
+
+<div class="topbar">
+  <div style="font-weight: 600; font-size: 18px;font-family:var(--sans)">OMNIPACK TOOLKIT</div>
+  <div class="topbar-actions">
+    <div id="org-badge" class="btn btn-ghost" title="Active Organization"><span class="material-symbols-outlined">power</span>Loading...</div>
+    <button class="btn btn-ghost" onclick="clearCacheAndRefresh()" title="Clear cache &amp; refresh">↺</button>
+    <button class="btn" onclick="vscode.postMessage({command:'configure'})"><span class="material-symbols-outlined">settings</span>Config</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="sidebar">
+    <div class="sidebar-search">
+      <input class="search-input" type="text" placeholder="Search types…" oninput="filterSidebar(this.value)" />
+    </div>
+    <div id="sidebar-list"></div>
+  </div>
+
+  <div class="content">
+    <div id="content-header" class="content-header" style="display:none">
+      <div class="content-type-name" id="header-type-name"></div>
+      <div class="header-tools">
+        <span id="sel-count" style="font-size:16px; font-family:var(--mono);">0 sel</span>
+        <button class="btn btn-ghost" onclick="selectAll()">All</button>
+        <button class="btn btn-ghost" onclick="selectNone()">Clear</button>
+      </div>
+    </div>
+    <div class="datapack-list" id="datapack-list">
+      <div style="text-align:center; padding:40px; color:var(--text3); font-size:15px;">Select a type on the left to browse datapacks.</div>
+    </div>
+    <div class="export-bar hidden" id="export-bar">
+      <div class="export-summary"><strong id="export-count">0</strong> datapack(s) selected</div>
+      <div style="display:flex; gap:6px;">
+        <button class="btn btn-accent" onclick="triggerReviewModal()">Review &amp; Export</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div style="font-weight:600; font-size: 14px; margin-bottom:12px;">Confirm Export Queue</div>
+    <div style="font-size: 14px; color: var(--text3); margin-bottom: 12px;">You are about to export the following components. Please choose how dependencies should be handled.</div>
+    
+    <div id="confirm-list" class="confirm-list"></div>
+    
+    <div style="display:flex; gap:8px; justify-content:center;">
+        <button class="btn btn-ghost" onclick="closeReviewModal()">Back</button>
+        <button class="btn" onclick="executeExport(false)">Export No Deps</button>
+        <button class="btn btn-accent" onclick="executeExport(true)">Export + Deps</button>
+    </div>
+  </div>
+</div>
+
+<div class="progress-overlay" id="progress-overlay">
+  <div class="progress-box">
+    <div style="font-weight:800; margin-bottom:12px; font-size: 16px;">Exporting...</div>
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-fill"></div></div>
+    <div id="progress-sub" style="font-size:14px; color:var(--text2); font-family:var(--mono); margin-bottom: 16px;">Starting</div>
+    <button class="btn btn-danger" onclick="cancelOperation()">Stop Queue</button>
+  </div>
+</div>
+
+<div class="result-overlay" id="result-overlay">
+  <div class="result-box">
+    <div id="result-icon" style="font-size:40px; margin-bottom:10px;"></div>
+    <div id="result-title" style="font-weight:800; margin-bottom:8px; font-size: 18px;"></div>
+    <div id="result-details" style="font-size:14px; color:var(--text2); margin-bottom:20px; line-height: 1.5;"></div>
+    <button class="btn btn-accent" onclick="closeResult()" style="width:100%">Close</button>
+  </div>
+</div>
+
+<script id="init-data" type="application/json">__INIT_DATA__</script>
+<script src="__SCRIPT_URI__" defer></script>
+</body>
+</html>

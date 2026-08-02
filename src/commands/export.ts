@@ -44,8 +44,8 @@ export async function exportDatapack(item: DatapackItem) {
     }
 
     const depth = (dependencyOption === 'All Dependencies') ? -1 : 0;
-
     const mapping = typeMappings[item.type];
+    
     if (!mapping) {
         vscode.window.showErrorMessage(`No mapping for type: ${item.type}`);
         return;
@@ -54,36 +54,42 @@ export async function exportDatapack(item: DatapackItem) {
     try {
         const exportKey = mapping.exportKeyFormat.replace('{label}', item.datapackId);
         const command = `${cliPath} --sfdx.username ${sfdxUsername} --projectPath ${projectPath[0].fsPath} packExport --key ${exportKey} --nojob --maxDepth ${depth} --json`;
-
+        console.log('Ran Export command: ', command);
 
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: `Exporting ${item.label} with ${dependencyOption.toLowerCase()}`,
-            cancellable: false
-        }, async (progress) => {
+            cancellable: true
+        }, async (progress, token) => {
+            
+            const abortController = new AbortController();
+            token.onCancellationRequested(() => abortController.abort());
+
             progress.report({ increment: 0 });
-            const { stdout, stderr } = await executeCliCommand(command, { cwd: workspacePath, maxBuffer: 1024 * 1024 * 10 });
+            try {
+                const { stdout, stderr } = await executeCliCommand(command, { cwd: workspacePath, maxBuffer: 1024 * 1024 * 10, signal: abortController.signal });
+                const result = JSON.parse(stdout);
+                
+                if (result.status === 'success') {
+                    vscode.window.showInformationMessage(`Successfully exported ${item.label}!`);
 
-            const result = JSON.parse(stdout);
-            if (result.status === 'success') {
-                vscode.window.showInformationMessage(`Successfully exported ${item.label}!`);
+                    const outputChannel = vscode.window.createOutputChannel('Vlocity Export');
+                    outputChannel.appendLine(`Successfully exported ${result.records[0].VlocityDataPackKey}`);
+                    outputChannel.show();
 
-                const outputChannel = vscode.window.createOutputChannel('Vlocity Export');
-                outputChannel.appendLine(`Successfully exported ${result.records[0].VlocityDataPackKey}`);
-                outputChannel.show();
-
-                try {
-                    await fs.unlink(path.join(workspacePath, 'VlocityBuildLog.yaml'));
-                } catch { }
-                try {
-                    await fs.unlink(path.join(workspacePath, 'VlocityBuildErrors.log'));
-                } catch { }
-                try {
-                    await fs.rm(path.join(workspacePath, 'vlocity-temp'), { recursive: true, force: true });
-                } catch { }
-
-            } else {
-                vscode.window.showErrorMessage(`Export error: ${result.message}`);
+                } else {
+                    vscode.window.showErrorMessage(`Export error: ${result.message}`);
+                }
+            } catch (err: any) {
+                if (err.message.includes('cancelled')) {
+                    vscode.window.showInformationMessage(`Export of ${item.label} was cancelled.`);
+                } else {
+                    vscode.window.showErrorMessage(`Export error: ${err.message}`);
+                }
+            } finally {
+                try { await fs.unlink(path.join(workspacePath, 'VlocityBuildLog.yaml')); } catch { }
+                try { await fs.unlink(path.join(workspacePath, 'VlocityBuildErrors.log')); } catch { }
+                try { await fs.rm(path.join(workspacePath, 'vlocity-temp'), { recursive: true, force: true }); } catch { }
             }
         });
     } catch (error: any) {

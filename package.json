@@ -2,7 +2,7 @@
   "name": "omnipack-toolkit",
   "displayName": "OmniPack Toolkit",
   "description": "Manage Vlocity DataPacks with ease — retrieve and export",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "publisher": "im5C",
   "repository": "https://github.com/kaandi02/omnipack-toolkit",
   "license": "MIT",
@@ -24,7 +24,8 @@
       },
       {
         "command": "omnipack-toolkit.exportDataPack",
-        "title": "Export Datapack"
+        "title": "Export Datapack",
+        "icon": "$(cloud-download)"
       },
       {
         "command": "omnipack-toolkit.configure",
@@ -32,8 +33,12 @@
         "icon": "$(settings-gear)"
       },
       {
+        "command": "omnipack-toolkit.loadMoreDatapacks",
+        "title": "Load More Datapacks"
+      },
+      {
         "command": "omnipack-toolkit.openUI",
-        "title": "Open OmniPack Toolkit UI",
+        "title": "Open Toolkit UI",
         "icon": "$(browser)"
       }
     ],
@@ -59,13 +64,15 @@
       "view/title": [
         {
           "command": "omnipack-toolkit.openUI",
-          "when": "view == vlocityDataPackExplorer"
+          "when": "view == vlocityDataPackExplorer",
+          "group": "navigation"
         }
       ],
       "view/item/context": [
         {
           "command": "omnipack-toolkit.exportDataPack",
-          "when": "view == vlocityDataPackExplorer && viewItem == datapackItem"
+          "when": "view == vlocityDataPackExplorer && viewItem == datapackItem",
+          "group": "inline"
         }
       ]
     },

@@ -1,4 +1,4 @@
-import { exec } from 'child_process';
+import { exec, ExecOptions } from 'child_process';
 import { promisify } from 'util';
 import * as vscode from 'vscode';
 
@@ -13,15 +13,18 @@ export interface OrgInfo {
     isDefault?: boolean;
 }
 
-export async function executeCliCommand( command: string, options?: { cwd?: string; maxBuffer?: number }): Promise<{ stdout: string; stderr: string }> {
+export async function executeCliCommand( command: string, options?: { cwd?: string; maxBuffer?: number; signal?: AbortSignal }): Promise<{ stdout: string; stderr: string }> {
     try {
-        const { stdout, stderr } = await execAsync(command, options);
+        const execOpts: ExecOptions = { ...options, killSignal: 'SIGKILL' };
+        const { stdout, stderr } = await execAsync(command, execOpts);
         return { stdout: stdout.toString(), stderr: stderr.toString() };
     } catch (error: any) {
+        if (error.name === 'AbortError' || error.killed || options?.signal?.aborted) {
+            throw new Error('Operation cancelled by user.');
+        }
         throw new Error(`CLI error: ${error.message}`);
     }
 }
-
 
 export async function detectCli(): Promise<'sf' | null> {
     try {
@@ -32,25 +35,27 @@ export async function detectCli(): Promise<'sf' | null> {
     }
 }
 
-
-export async function listOrgs(): Promise<OrgInfo[]> {
+export async function listOrgs(signal?: AbortSignal): Promise<OrgInfo[]> {
     const cli = await detectCli();
     if (!cli) { return []; }
 
     try {
-        return await listOrgsViaSf();
-    } catch {
+        return await listOrgsViaSf(signal);
+    } catch (err: any) {
+        if (err.message === 'Operation cancelled by user.'){ throw err; }
         return [];
     }
 }
 
-async function listOrgsViaSf(): Promise<OrgInfo[]> {
-
+async function listOrgsViaSf(signal?: AbortSignal): Promise<OrgInfo[]> {
     let stdout = '';
     try {
-        const result = await execAsync('sf org list --json', { timeout: 15000 });
-        stdout = result.stdout;
+        const result = await execAsync('sf org list --json', { timeout: 15000, signal, killSignal: 'SIGKILL' } as ExecOptions);
+        stdout = result.stdout.toString();
     } catch (err: any) {
+        if (err.name === 'AbortError' || err.killed || signal?.aborted) {
+            throw new Error('Operation cancelled by user.');
+        }
         stdout = err.stdout || '';
     }
 

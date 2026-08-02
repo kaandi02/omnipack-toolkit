@@ -1,43 +1,32 @@
 # OmniPack Toolkit: Extension for Vlocity Datapack Management
 
-
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-Support%20Development-orange?style=for-the-badge&logo=buy-me-a-coffee)](https://buymeacoffee.com/im83.75)
 
 Hey there! If you're knee-deep in Salesforce development with Vlocity (OmniStudio), you know how fiddly managing datapacks can be. Exporting, deploying, and keeping everything organized? It's a hassle without the right tools. That's why I built **OmniPack Toolkit** – a straightforward VS Code extension that streamlines exporting right from your editor. No more jumping between terminals and UIs; just smooth, integrated workflows.
 
+It is not a complete package, but there should be a starting point always and this is it (^_~).
 
-It is not a complete package, but there should be a starting point always and this is it(^_~).
+I created this because I got tired of the manual grind during my own projects. It's designed to feel intuitive, to browse datapacks, and to trigger quick exports (with or without dependencies). Let's dive in!
 
-
-I created this because I got tired of the manual grind during my own projects. It's designed to feel intuitive, to browse datapacks and quick exports (with or without dependencies). Let's dive in!
-
-
+🤝 **Vibe-Coded with Google Gemini**: This extension's UI and state management were co-architected and vibe-coded alongside Google Gemini.
 
 ## What Makes It Awesome?
 
-- **Native CLI**: Uses native **[Vlocity-CLI](https://github.com/vlocityinc/vlocity_build)** to export and fetch the datapacks.
+- **Native CLI**: Uses native **[Vlocity-CLI](https://github.com/vlocityinc/vlocity_build)** to export and fetch the datapacks securely in the background.
 
-- **Datapack Explorer Tree View**: Browse categories like OmniScripts, DataRaptors, Products, and more in a clean sidebar tree. Expand to see available datapacks from your org, and export them with a right-click.
+- **Full-Screen Webview UI**: Don't want to work in a tiny sidebar? Open the full OmniPack Webview to search, filter, and mass-select datapacks across categories. 
 
-- **Export with Flexibility**: Choose to export a single datapack or grab all its dependencies. It uses the Vlocity CLI under the hood for reliable results.
+- **Pre-Flight Review Modal**: When bulk-exporting, a clean review modal groups your selections by type so you know exactly what's going to your local machine before firing the CLI.
 
-- **Smart Configuration**: Set up your SFDX username (or alias), and you're good. It even pulls org aliases from your SFDX setup for easy selection.
+- **Safe Cancellations**: Stuck on a massive export or a hanging org query? Hit "Cancel" to aggressively kill the underlying OS process and stop the queue instantly.
 
-- **Status Bar Integration**: See your selected SFDX org at a glance in the status bar – click to reconfigure on the fly.
+- **Datapack Explorer Tree View**: Browse categories in a custom Activity Bar. Expand to see available datapacks, use inline quick-actions, and click "Load More" to paginate through massive orgs without lag.
 
-- **Refresh and Reload**: Keep your datapack list fresh with a simple refresh command.
+- **Smart Configuration & Real-time State**: Set up your SFDX username once. The extension auto-detects aliases and instantly updates your status bar and Webview UI without requiring reloads.
 
 - **CLI Checks Built-In**: On activation, it verifies if Vlocity CLI is installed and prompts you if not. No surprises!
 
-
-
-This extension focuses on the essentials without bloating your VS Code. It's perfect for developers who want to stay in their flow.
-
-
-
 ## Getting Started
-
-
 
 ### Installation
 
@@ -49,15 +38,9 @@ This extension focuses on the essentials without bloating your VS Code. It's per
 
 4. Click Install – done!
 
-
-
-Or, if you're feeling adventurous, sideload it from a .vsix file (grab it from the releases page if available).
-
-
-
 ### Requirements
 
-- **Node.js**: Version 18 or higher (the Vlocity CLI needs it).
+- **Node.js**: Version 18 or higher (Version 24+ recommended; the Vlocity CLI needs it).
 
 - **Vlocity CLI**: Install globally with `npm install -g vlocity`. If it's not there, the extension will nudge you with install options.
 
@@ -66,45 +49,30 @@ Or, if you're feeling adventurous, sideload it from a .vsix file (grab it from t
 - **A Vlocity-enabled Salesforce Org**: Obviously!
 
 
-
-Pro tip: Make sure your project folder is open in VS Code – that's where the magic happens.
-
-
+*Pro tip: Make sure your project folder is open in VS Code – that's where the magic happens.*
 
 ## How to Use It
 
-
-
-Once installed, you'll see the **Vlocity DataPack Explorer** in your sidebar. If it's empty, hit the refresh button or run the "Vlocity: Refresh Datapacks" command.
-
-
+Once installed, click the **OmniPack Toolkit** icon (the cloud download icon) in your Activity Bar.
 
 ### Step 1: Configure Your Settings
-
-- Run the command "Vlocity: Configure Settings" (Ctrl+Shift+P or Cmd+Shift+P, then type it).
-
+- Run the command "Vlocity: Configure Settings" (Ctrl+Shift+P) or click the **⚙ Config** button in the UI.
 - It'll prompt for your SFDX username or alias (it auto-detects aliases already logged in).
+- Boom – your status bar and Webview badge now show the active org!
 
-- Boom – your status bar now shows the selected org!
+### Step 2: Browse and Export (Two Ways!)
+**The Webview Way (Recommended for Mass Exports):**
+- Click the **Open Full UI** button at the top of the Explorer sidebar.
+- Select a category (e.g., OmniScript) from the collapsible left panel.
+- Filter, search, and check off the datapacks you want.
+- Click **Review & Export**, verify your list in the modal, and choose your dependency preference.
 
+**The Tree View Way (Recommended for Quick Singles):**
+- Expand a category in the sidebar tree.
+- Hover over a datapack and click the inline **Cloud Download** icon (or right-click -> Export DataPack).
+- Choose your project path and dependency option.
 
-
-### Step 2: Browse and Export Datapacks
-
-- In the tree view, expand a category (e.g., "OmniScript" or "Product2").
-
-- Right-click a datapack item and select "Export DataPack".
-
-- Choose the path where you want to export the datapack.
-
-- Choose "No Dependencies" for a quick export or "All Dependencies" for the full chain.
-
-- Watch the progress in notifications – success messages and logs appear in an output channel.
-
-
-If something goes wrong (hey, Salesforce can be picky), check the output channel or error notifications for details.
-
-
+*If an operation hangs, just hit the red **Stop** button in the Webview to kill the CLI process.*
 
 ## Configuration Options
 
@@ -113,12 +81,11 @@ Tweak these in VS Code's Settings (JSON or UI):
 - `vlocityDatapackManager.sfdxUsername`: Your SFDX org username or alias.
 
 
-I kept the configs minimal – no fluff.
-
+*I kept the configs minimal – no fluff.*
 
 ## Troubleshooting
 
-- **No datapacks showing?** Double-check your SFDX auth and refresh the tree.
+- **No datapacks showing?** Double-check your SFDX auth and refresh the tree/cache.
 
 - **CLI errors?** Ensure Vlocity is installed and your Node version is up to snuff.
 
@@ -126,11 +93,9 @@ I kept the configs minimal – no fluff.
 
 - If you're stuck, open an issue on the repo – I'm here to help!
 
-
-
 ## Why I Built This
 
-As a dev who's wrestled with Vlocity, I wanted something that just *works* without using any manifest file to extract a datapack everytime. No overcomplicated features, just the core stuff to speed up your day. It's open-source, so if you spot a bug or have an idea (like adding more datapack types), fork it and PR away!
+As a dev who's wrestled with Vlocity, I wanted something that just *works* without using a manifest file to extract a datapack every single time. No overcomplicated features, just the core stuff to speed up your day. It's open-source, so if you spot a bug or have an idea (like adding more datapack types), fork it and PR away!
 
 ## Support This Project
 
@@ -138,7 +103,7 @@ If OmniPack Toolkit saves you time and makes your dev life easier, consider buyi
 
 [![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://buymeacoffee.com/im83.75)
 
-Every coffee fuels late-night coding sessions and keeps me run longer. Thanks for your support! 🙏
+Every coffee fuels late-night coding sessions and keeps me running longer. Thanks for your support! 🙏
 
 ## Contributing
 
@@ -155,11 +120,9 @@ Love it? Hate it? Want to improve it?
 - Submit a pull request – I'll review ASAP.
 
 
-
 ## License
 
 MIT – use it freely, but if you build something cool on top, let me know!
 
 ---
-
 Thanks for checking out OmniPack Toolkit. Happy coding! 🚀 If this saves you time, drop a star on the repo or share it with your team. Questions? Hit me up in the issues.

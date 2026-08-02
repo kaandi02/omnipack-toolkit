@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { listOrgs, detectCli, OrgInfo } from '../utils/cli';
+import { listOrgs, OrgInfo } from '../utils/cli';
 
 let statusBarItem: vscode.StatusBarItem;
 
@@ -8,13 +8,20 @@ export async function configureExtension() {
 
     await vscode.window.withProgress(
         { location: vscode.ProgressLocation.Notification, title: 'Loading Salesforce orgs…', cancellable: true },
-        async () => {
+        async (progress, token) => {
             
+            const abortController = new AbortController();
+            token.onCancellationRequested(() => abortController.abort());
+
             let orgs: OrgInfo[] = [];
             try {
-                orgs = await listOrgs();
+                orgs = await listOrgs(abortController.signal);
                 console.log(`Found ${orgs.length} authenticated org(s).`);
-            } catch {
+            } catch (err: any) {
+                if (err.message.includes('cancelled')) {
+                    vscode.window.showInformationMessage('Org loading cancelled.');
+                    return;
+                }
                 vscode.window.showErrorMessage('Failed to load orgs. Make sure Salesforce CLI is installed and authenticated.');
                 return;
             }
@@ -42,9 +49,7 @@ export async function configureExtension() {
                 }
             }
 
-            const allItems: OrgPickItem[] = [...orgItems];
-
-            const picked = await vscode.window.showQuickPick(allItems, {
+            const picked = await vscode.window.showQuickPick(orgItems, {
                 placeHolder: orgs.length
                     ? 'Select an org to continue'
                     : 'No authenticated orgs found. Please authenticate with Salesforce CLI.',

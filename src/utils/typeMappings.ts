@@ -55,6 +55,10 @@ export const typeMappings: { [key: string]: { objectName: string; exportKeyForma
         objectName: '%vlocity_namespace%__EntityFilter__c',
         exportKeyFormat: 'EntityFilter/{label}'
     },
+    'FlexCard': {
+        objectName: '%vlocity_namespace%__VlocityCard__c',
+        exportKeyFormat: 'FlexCard/{label}'
+    },
     'IntegrationProcedure': {
         objectName: '%vlocity_namespace%__OmniScript__c',
         exportKeyFormat: 'IntegrationProcedure/{label}'
